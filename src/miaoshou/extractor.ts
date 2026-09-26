@@ -207,28 +207,41 @@ function parseWeight(value: string): { weight: number | null; weightUnit: "g" | 
   };
 }
 
-function weightRowText(field: HTMLElement): string {
-  const row = field.closest<HTMLElement>(
-    ".el-form-item, .ant-form-item, [class*='form-item'], [class*='field-item'], tr, [role='group']"
-  );
-  return normalizeText(row?.innerText || row?.textContent);
-}
+function packageWeightFromContainer(root: ParentNode): {
+  weight: number | null;
+  weightUnit: "g" | "kg" | null;
+} {
+  const labelCandidates = Array.from(root.querySelectorAll<HTMLElement>("*"))
+    .filter((element) => {
+      const text = normalizeText(element.innerText || element.textContent);
+      return text.length <= 40 && /包裹重量/.test(text);
+    })
+    .sort((left, right) =>
+      normalizeText(left.innerText || left.textContent).length
+      - normalizeText(right.innerText || right.textContent).length
+    );
 
-function parseLabeledWeight(
-  fields: FieldDescriptor[],
-  pattern: RegExp
-): { weight: number | null; weightUnit: "g" | "kg" | null } | null {
-  const candidates = fields.filter((field) => pattern.test(field.explicitLabel));
-  for (const field of candidates) {
-    const rowText = weightRowText(field.field);
-    const source = field.value || rowText.replace(field.explicitLabel, "").trim();
-    const parsed = parseWeight(source);
-    if (parsed.weight !== null) {
-      const unit = parsed.weightUnit ?? parseWeight(rowText).weightUnit;
-      return { weight: parsed.weight, weightUnit: unit };
+  for (const label of labelCandidates) {
+    let container = label.parentElement;
+    for (let depth = 0; container && depth < 10; depth += 1, container = container.parentElement) {
+      const numericInput = container.querySelector<HTMLInputElement>("input.jx-input__inner");
+      if (!numericInput) continue;
+
+      const parsedWeight = parseNumber(numericInput.value);
+      if (parsedWeight === null) continue;
+
+      const unitInput = container.querySelector<HTMLInputElement>("input.jx-select__input");
+      const unitRegion = unitInput?.parentElement;
+      const unitText = normalizeText([
+        unitInput?.value,
+        unitRegion?.innerText || unitRegion?.textContent
+      ].filter(Boolean).join(" "));
+      const unit = unitText.match(/\b(kg|g)\b/i)?.[1].toLowerCase() as "g" | "kg" | undefined;
+      return { weight: parsedWeight, weightUnit: unit ?? null };
     }
   }
-  return null;
+
+  return { weight: null, weightUnit: null };
 }
 
 function collectAttributes(fields: FieldDescriptor[]): Record<string, string> {
@@ -367,9 +380,7 @@ export function extractMiaoshouProduct(document: Document, location: Location): 
     : estimatedSalePrice !== null || salePriceValue
       ? "sale_price"
       : null;
-  const weight = parseLabeledWeight(fields, /包裹重量/i)
-    ?? parseLabeledWeight(fields, fieldPatterns.weight)
-    ?? { weight: null, weightUnit: null };
+  const weight = packageWeightFromContainer(editorRoot);
 
   return {
     title: findTitle(fields),
