@@ -231,12 +231,22 @@ function packageWeightFromContainer(root: ParentNode): {
       if (parsedWeight === null) continue;
 
       const unitInput = container.querySelector<HTMLInputElement>("input.jx-select__input");
-      const unitRegion = unitInput?.parentElement;
-      const unitText = normalizeText([
-        unitInput?.value,
-        unitRegion?.innerText || unitRegion?.textContent
-      ].filter(Boolean).join(" "));
-      const unit = unitText.match(/\b(kg|g)\b/i)?.[1].toLowerCase() as "g" | "kg" | undefined;
+      let unitRegion: HTMLElement | null = unitInput;
+      let unit: "g" | "kg" | null = null;
+      while (unitRegion) {
+        const unitText = normalizeText(
+          unitRegion instanceof HTMLInputElement
+            ? `${unitRegion.value} ${unitRegion.innerText || unitRegion.textContent}`
+            : unitRegion.innerText || unitRegion.textContent
+        );
+        const match = unitText.match(/\b(kg|g)\b/i);
+        if (match) {
+          unit = match[1].toLowerCase() as "g" | "kg";
+          break;
+        }
+        if (unitRegion === container) break;
+        unitRegion = unitRegion.parentElement;
+      }
       return { weight: parsedWeight, weightUnit: unit ?? null };
     }
   }
