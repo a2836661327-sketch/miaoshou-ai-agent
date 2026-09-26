@@ -1,0 +1,40 @@
+name: Build browser extensions
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Chromium extension
+        run: npm run build
+
+      - name: Build Firefox extension
+        run: npm run build:firefox
+
+      - name: Upload Chromium extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: miaoshou-ai-chromium-v0.1
+          path: .output/chrome-mv3/
+          if-no-files-found: error
+
+      - name: Upload Firefox extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: miaoshou-ai-firefox-v0.1
+          path: .output/firefox-mv2/
+          if-no-files-found: error
