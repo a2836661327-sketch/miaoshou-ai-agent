@@ -15,7 +15,7 @@ npm run build:firefox
 
 构建输出位于 `.output/`。Chromium 构建使用 Manifest V3；Firefox 构建由 WXT 生成 Firefox 扩展包。也可以运行 `npm run dev` 或 `npm run dev:firefox` 启动对应浏览器的开发构建。
 
-仓库的 GitHub Actions 会在每次 push 或手动运行时构建 Chromium 和 Firefox 版本，并分别上传 `.output/chrome-mv3/`、`.output/firefox-mv2/` 作为构建 artifact。下载方式：打开 GitHub 仓库的 **Actions**，进入最近一次 **Build browser extensions** 成功运行，在页面底部 **Artifacts** 区域下载 `miaoshou-ai-chromium-v0.1` 或 `miaoshou-ai-firefox-v0.1`。Chromium artifact 下载后解压，选择直接包含 `manifest.json` 的扩展目录。
+仓库的 GitHub Actions 会在每次 push 或手动运行时构建 Chromium 和 Firefox 版本，并分别上传 `.output/chrome-mv3/`、`.output/firefox-mv2/` 作为构建 artifact。下载方式：打开 GitHub 仓库的 **Actions**，进入最近一次 **Build browser extensions** 成功运行，在页面底部 **Artifacts** 区域下载 `miaoshou-ai-chromium-v0.1-erp91miaoshou` 或 `miaoshou-ai-firefox-v0.1-erp91miaoshou`。Chromium artifact 下载后解压，选择直接包含 `manifest.json` 的扩展目录。
 
 在本地打包 Chromium 测试目录（需先运行 `npm run build`）：
 
@@ -48,4 +48,4 @@ Compress-Archive -Path .output\chrome-mv3 -DestinationPath miaoshou-ai-chromium-
 
 提取器单独位于 `src/miaoshou/extractor.ts`，基于页面可见控件的标签、名称、占位文本和常见富文本编辑器进行启发式匹配。由于妙手可能调整页面结构、控件标签或编辑器实现，字段读取并非稳定的官方接口；特别是属性表格、富文本描述和商品图片可能需要根据真实页面 DOM 增加专用选择器。
 
-扩展目前匹配 `miaoshou.com`、`miaoshou.com.cn` 和 `miaoshou.cn` 的 HTTP/HTTPS 页面。其他妙手 ERP 域名需要添加到 `wxt.config.ts` 与 `entrypoints/content.ts` 的匹配规则。
+扩展在 `https://erp.91miaoshou.com/*` 全站运行，并在该站点的所有 frame 中注入，包括 Mercado Libre 采集箱列表页与商品编辑弹窗/页面。商品字段提取仍是启发式读取，页面本身若通过跨域 iframe 加载，浏览器的同源与扩展权限规则仍可能限制内容访问。

@@ -28,13 +28,13 @@ jobs:
       - name: Upload Chromium extension
         uses: actions/upload-artifact@v4
         with:
-          name: miaoshou-ai-chromium-v0.1
+          name: miaoshou-ai-chromium-v0.1-erp91miaoshou
           path: .output/chrome-mv3/
           if-no-files-found: error
 
       - name: Upload Firefox extension
         uses: actions/upload-artifact@v4
         with:
-          name: miaoshou-ai-firefox-v0.1
+          name: miaoshou-ai-firefox-v0.1-erp91miaoshou
           path: .output/firefox-mv2/
           if-no-files-found: error

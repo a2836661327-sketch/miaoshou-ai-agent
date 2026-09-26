@@ -1,10 +1,6 @@
 import { defineConfig } from "wxt";
 
-const miaoshouMatches = [
-  "*://*.miaoshou.com/*",
-  "*://*.miaoshou.com.cn/*",
-  "*://*.miaoshou.cn/*"
-];
+const miaoshouMatches = ["https://erp.91miaoshou.com/*"];
 
 export default defineConfig({
   manifest: {

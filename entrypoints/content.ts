@@ -1,12 +1,9 @@
 import { mountAssistant } from "../src/ui/assistant";
-import { extractMiaoshouProduct, isProductEditorPage } from "../src/miaoshou/extractor";
+import { extractMiaoshouProduct } from "../src/miaoshou/extractor";
 
 export default defineContentScript({
-  matches: [
-    "*://*.miaoshou.com/*",
-    "*://*.miaoshou.com.cn/*",
-    "*://*.miaoshou.cn/*"
-  ],
+  matches: ["https://erp.91miaoshou.com/*"],
+  allFrames: true,
   runAt: "document_idle",
   main() {
     let mounted = false;
@@ -26,10 +23,10 @@ export default defineContentScript({
 
     const checkPage = () => {
       scheduledCheck = false;
-      if (!mounted && isProductEditorPage(document, location)) {
+      if (!mounted && document.body) {
         mountAssistant(document, () => extractMiaoshouProduct(document, location));
         mounted = true;
-        console.info("[Miaoshou AI] Assistant mounted on a product editor page.");
+        console.info("[Miaoshou AI] Assistant mounted on an ERP page.");
       }
     };
 
