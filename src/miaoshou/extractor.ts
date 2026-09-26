@@ -200,11 +200,35 @@ function richDescription(document: Document): string {
 
 function parseWeight(value: string): { weight: number | null; weightUnit: "g" | "kg" | null } {
   const number = parseNumber(value);
-  const unitMatch = value.match(/(kg|g)\b/i);
+  const unitMatch = value.match(/\b(kg|g)\b/i);
   return {
     weight: number,
     weightUnit: unitMatch ? unitMatch[1].toLowerCase() as "g" | "kg" : null
   };
+}
+
+function weightRowText(field: HTMLElement): string {
+  const row = field.closest<HTMLElement>(
+    ".el-form-item, .ant-form-item, [class*='form-item'], [class*='field-item'], tr, [role='group']"
+  );
+  return normalizeText(row?.innerText || row?.textContent);
+}
+
+function parseLabeledWeight(
+  fields: FieldDescriptor[],
+  pattern: RegExp
+): { weight: number | null; weightUnit: "g" | "kg" | null } | null {
+  const candidates = fields.filter((field) => pattern.test(field.explicitLabel));
+  for (const field of candidates) {
+    const rowText = weightRowText(field.field);
+    const source = field.value || rowText.replace(field.explicitLabel, "").trim();
+    const parsed = parseWeight(source);
+    if (parsed.weight !== null) {
+      const unit = parsed.weightUnit ?? parseWeight(rowText).weightUnit;
+      return { weight: parsed.weight, weightUnit: unit };
+    }
+  }
+  return null;
 }
 
 function collectAttributes(fields: FieldDescriptor[]): Record<string, string> {
@@ -343,8 +367,9 @@ export function extractMiaoshouProduct(document: Document, location: Location): 
     : estimatedSalePrice !== null || salePriceValue
       ? "sale_price"
       : null;
-  const weightValue = valueForPattern(fields, editorRoot, "weight");
-  const weight = parseWeight(weightValue);
+  const weight = parseLabeledWeight(fields, /包裹重量/i)
+    ?? parseLabeledWeight(fields, fieldPatterns.weight)
+    ?? { weight: null, weightUnit: null };
 
   return {
     title: findTitle(fields),
