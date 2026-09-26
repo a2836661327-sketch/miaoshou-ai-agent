@@ -7,7 +7,7 @@ export default defineConfig({
     name: "妙手 AI",
     description: "读取妙手 ERP 当前商品信息",
     version: "0.1.0",
-    permissions: [],
+    permissions: ["storage"],
     host_permissions: miaoshouMatches,
     browser_specific_settings: {
       gecko: {

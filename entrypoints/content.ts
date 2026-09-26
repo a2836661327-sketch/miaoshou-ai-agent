@@ -1,5 +1,5 @@
 import { mountAssistant } from "../src/ui/assistant";
-import { extractMiaoshouProduct } from "../src/miaoshou/extractor";
+import { collectProductFieldDiagnostics, extractMiaoshouProduct } from "../src/miaoshou/extractor";
 
 export default defineContentScript({
   matches: ["https://erp.91miaoshou.com/*"],
@@ -24,7 +24,11 @@ export default defineContentScript({
     const checkPage = () => {
       scheduledCheck = false;
       if (!mounted && document.body) {
-        mountAssistant(document, () => extractMiaoshouProduct(document, location));
+        mountAssistant(
+          document,
+          () => extractMiaoshouProduct(document, location),
+          () => collectProductFieldDiagnostics(document)
+        );
         mounted = true;
         console.info("[Miaoshou AI] Assistant mounted on an ERP page.");
       }

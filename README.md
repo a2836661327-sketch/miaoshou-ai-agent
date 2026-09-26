@@ -15,7 +15,9 @@ npm run build:firefox
 
 构建输出位于 `.output/`。Chromium 构建使用 Manifest V3；Firefox 构建由 WXT 生成 Firefox 扩展包。也可以运行 `npm run dev` 或 `npm run dev:firefox` 启动对应浏览器的开发构建。
 
-仓库的 GitHub Actions 会在每次 push 或手动运行时构建 Chromium 和 Firefox 版本，并分别上传 `.output/chrome-mv3/`、`.output/firefox-mv2/` 作为构建 artifact。下载方式：打开 GitHub 仓库的 **Actions**，进入最近一次 **Build browser extensions** 成功运行，在页面底部 **Artifacts** 区域下载 `miaoshou-ai-chromium-v0.1-erp91miaoshou` 或 `miaoshou-ai-firefox-v0.1-erp91miaoshou`。Chromium artifact 下载后解压，选择直接包含 `manifest.json` 的扩展目录。
+仓库的 GitHub Actions 会在每次 push 或手动运行时构建 Chromium 和 Firefox 版本，并分别上传 `.output/chrome-mv3/`、`.output/firefox-mv2/` 作为构建 artifact。下载方式：打开 GitHub 仓库的 **Actions**，进入最近一次 **Build browser extensions** 成功运行，在页面底部 **Artifacts** 区域下载 `miaoshou-ai-chromium-v0.1-fields-drag` 或 `miaoshou-ai-firefox-v0.1-fields-drag`。Chromium artifact 下载后解压，选择直接包含 `manifest.json` 的扩展目录。
+
+助手按钮可在视口内拖动，位置保存在扩展本地存储中；双击按钮可恢复默认位置。助手面板中的“导出字段诊断”仅导出商品编辑区域的表单 DOM 元数据，不读取浏览器存储、Cookie 或凭据字段。
 
 在本地打包 Chromium 测试目录（需先运行 `npm run build`）：
 
